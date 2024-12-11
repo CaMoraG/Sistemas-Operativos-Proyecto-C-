@@ -1,0 +1,32 @@
+void Inicializar(int horainicio, int segundoshora, int totalpersonas,
+                 char *nompipe) {
+
+  mode_t fifo_mode = S_IRUSR | S_IWUSR;
+  solicitud sol;
+  int result, bytes;
+  horaactual = horainicio;
+  signal(SIGALRM, Alarma);
+
+  unlink(nompipe);
+  if (mkfifo(nompipe, fifo_mode) == -1) {
+    perror("mkfifo");
+    exit(1);
+  }
+  if ((fdCont = open(nompipe, O_RDONLY)) == -1) {
+    perror(" Servidor abriendo el pipe: ");
+    exit(1);
+  }
+  printf("a\n");
+  while (horaactual < horafinal) {
+    alarm(segundoshora);
+    while (read(fdCont, &sol, sizeof(solicitud)) < 1) {
+
+    }
+    while (read(fdCont, &sol, sizeof(solicitud)) > 0) {
+      printf("%s %d %d \n", sol.nombrefamilia, sol.hora,
+             sol.numpersonas);
+    }
+    //pause();
+  }
+  close(fdCont);
+}
